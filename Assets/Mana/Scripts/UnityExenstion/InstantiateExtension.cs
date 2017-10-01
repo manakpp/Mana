@@ -32,9 +32,45 @@ namespace Mana
 			}
 
 			T type = createdObject.FindComponent<T>(searchType, showSearchWarnings);
-			if (gameObject == null)
+			if (createdObject == null)
 			{
-				Logger.Warning("You tried to find component of type [{0}] on [{1}] but it doesn't exist.", typeof(T), gameObject.name);
+				Logger.Warning("You tried to find component of type [{0}] on [{1}] but it doesn't exist.", typeof(T), createdObject.name);
+				return null;
+			}
+
+			return type;
+		}
+
+		public static Component Clone(this Component behaviour, Transform parent = null, bool instantiateInWorldSpace = false)
+		{
+			if (behaviour == null || behaviour.gameObject == null)
+			{
+				Logger.Warning("You tried to instantiate something but it was null. I can't log anything for you. Check the stack.");
+				return null;
+			}
+			
+			GameObject createdObject = GameObject.Instantiate(behaviour.gameObject, parent, instantiateInWorldSpace);
+			return createdObject.GetComponent(behaviour.GetType());
+		}
+
+		public static T Clone<T>(this MonoBehaviour behaviour, Transform parent = null, bool instantiateInWorldSpace = false,
+			FindComponentExtension.SearchType searchType = FindComponentExtension.SearchType.Self, bool showSearchWarnings = true) where T : MonoBehaviour
+		{
+			if (behaviour == null)
+			{
+				return null;
+			}
+
+			GameObject createdObject = behaviour.gameObject.Clone(parent, instantiateInWorldSpace);
+			if (createdObject == null)
+			{
+				return null;
+			}
+
+			T type = createdObject.FindComponent<T>(searchType, showSearchWarnings);
+			if (createdObject == null)
+			{
+				Logger.Warning("You tried to find component of type [{0}] on [{1}] but it doesn't exist.", typeof(T), createdObject.name);
 				return null;
 			}
 

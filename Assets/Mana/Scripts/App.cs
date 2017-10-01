@@ -12,6 +12,8 @@ namespace Mana
 	public class App : MonoBehaviour
 	{
 		[SerializeField]
+		private GlobalContext m_globalContextPrefab;
+
 		private GlobalContext m_globalContext;
 
 		private static App s_instance;
@@ -28,7 +30,7 @@ namespace Mana
 			s_instance = this;
 			DontDestroyOnLoad(gameObject);
 
-			if (m_globalContext == null)
+			if (m_globalContextPrefab == null)
 			{
 				Logger.Error("No GlobalContext was set on App. One is needed to start.");
 				return;
@@ -41,6 +43,8 @@ namespace Mana
 		{
 			GameObject contextParent = new GameObject("Contexts");
 			contextParent.transform.SetParent(transform);
+
+			m_globalContext = m_globalContextPrefab.Clone<GlobalContext>();
 			m_globalContext.Initialise(contextParent);
 
 			yield return StartCoroutine(m_globalContext.LoadRoutine());
